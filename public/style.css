@@ -29,7 +29,7 @@ html, body {
     0% {
         opacity: 100%;
     }
-    75% {
+    66% {
         opacity: 100%;
         animation-timing-function: ease-out;
     }

@@ -34,7 +34,7 @@ function selectPlayer(n) {
     document.addEventListener("click", () => {
         playerNumberElem.style.animation = "none";
         void playerNumberElem.offsetWidth;
-        playerNumberElem.style.animation = "debug-info 4s";
+        playerNumberElem.style.animation = "debug-info 3s";
     });
 }
 
