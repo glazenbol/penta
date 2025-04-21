@@ -9,7 +9,7 @@ const io = new Server(server);
 const players = [];
 let chordNumber = 0;
 const chords = [
-    {'chord': ['C#3', 'D#3', 'G#3'], upper: [['D4','E4']]},
+    {'chord': ['C#3', 'D#3', 'G#3'], upper: [['D5','E5']]},
     {'chord': ['C#3', 'E3', 'B3'], upper: [['G#4', 'A4']]},
     {'chord': ['C3', 'E3', 'D4'], upper: [['G4', 'B4'], ['A4', 'B4']]},
     {'chord': ['A2', 'C#3', 'G#3'], upper: [['A#4', 'D#5'], ['D#5', 'E5']]},
@@ -24,9 +24,7 @@ io.on('connection', (socket) => {
     socket.on('playerSelect', (data) => {
         console.log('Player selected:', data);
         players[data] = socket;
-        for (const pl of players) {
-            console.log(pl);
-        }
+        playersRandomized = shuffled(players);
     });
 
     // Listen for score updates from a client
@@ -38,27 +36,32 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
     });
+
+    socket.on('start', () => {
+        console.log("Started by Penta Control!")
+        setInterval(changeState, 100);  // set to 5000 TODO
+    })
 });
 
 let state = 0;
-let playersRandomized = players;
 let n_playing = 2;
+let mapping = [0, 1, 2, 3, 4];
 
 const changeState = function() {
-    console.log(players.length);
     switch (state) {
         case 0:
+            shuffle(mapping);
             io.emit("state", "mute");
             break;
         case 1:
-            playersRandomized = shuffled(players);
             for (let i = 0; i < n_playing; i ++) {
                 let note = chords[chordNumber].upper[0][i];
                 // protection for when not all players have connected yet TODO make start function
                 if (playersRandomized.length > i) {
                     let player = playersRandomized[i];
                     console.log("note emit");
-                    player.emit("note", Note.midi(note));
+                    io.emit("note", Note.midi(note));
+                    // player.emit("note", Note.midi(note));
                 }
                 console.log("note:", note);
             }
@@ -67,10 +70,13 @@ const changeState = function() {
             for (let i = n_playing; i < 5; i ++) {
                 let note = chords[chordNumber].chord[i];
                 // protection for when not all players have connected yet TODO make start function
-                if (playersRandomized.length > i) {
-                    let player = playersRandomized[i];
+                const player = players[mapping[i]];
+                if (player) {
                     console.log("note emit");
-                    player.emit("note", Note.midi(note));
+                    io.emit("note", Note.midi(note));
+                    // player.emit("note", Note.midi(note));
+                } else {
+                    console.warn("WARN player offline: ", i);
                 }
                 console.log("note", note);
             }
@@ -90,14 +96,15 @@ const changeState = function() {
     state %= 5;
 }
 
-function shuffled(arr) {
-    let shuffled = [...arr]; // Copy the array
+function sendNote(note, state, player) {
+
+}
+// shuffles the array passed in, doesn't duplicate anything so beware!
+function shuffle(shuffled) {
     for (let i = shuffled.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap
     }
-    return shuffled;
 }
 
 server.listen(3000, () => console.log('Server running on http://localhost:3000'));
-setInterval(changeState, 1000);//5000); TODO

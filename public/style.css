@@ -1,8 +1,48 @@
 html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevent scrolling */
+    overflow: hidden;
+    height: 100%;
 }
-canvas {
-    display: block; /* Remove extra space below the canvas */
+
+#player-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+}
+
+#player-selector > * {
+    font-size: 7vh;
+    padding: 1vh;
+    margin: 0;
+}
+
+#note-screen {
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+#note {
+    font-size: 40vw;
+    text-align: center;
+    margin: 0px;
+}
+
+#play-style {
+    font-size: 30vw;
+    text-align: center;
+    margin: 0px;
+}
+
+#player-number {
+    font-family:'Courier New', Courier, monospace;
+    font-size: 1em;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: rgb(184, 183, 183);
+    margin: 0;
 }
