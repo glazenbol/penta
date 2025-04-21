@@ -38,6 +38,40 @@ function selectPlayer(n) {
     });
 }
 
+socket.on('intro', () => {
+    noteElem.innerHTML = "";
+    playStyleElem.innerHTML = "⬠";
+    playStyleElem.style.color = "whitesmoke";
+    noteScreenElem.style.transitionTimingFunction = "linear";
+    noteScreenElem.style.transition = "background-color 1s";
+    noteScreenElem.style.backgroundColor = "black";
+});
+
+socket.on('countdown', (n) => {
+    noteElem.innerHTML = n;
+    playStyleElem.innerHTML = "";
+    noteScreenElem.style.transitionTimingFunction = "linear";
+    noteScreenElem.style.transition = "background-color 2s";
+    noteScreenElem.style.backgroundColor = "whitesmoke";
+});
+
+socket.on('arp', () => {
+    noteElem.innerHTML = "";
+    playStyleElem.innerHTML = ".-‘";
+    noteScreenElem.style.transitionTimingFunction = "linear";
+    noteScreenElem.style.transition = "background-color 2s";
+    noteScreenElem.style.backgroundColor = "whitesmoke";
+});
+
+socket.on('melody', (newNote) => {
+    note = Tonal.Note.fromMidiSharps(newNote + transpose);
+    noteElem.innerHTML = note;
+    playStyleElem.innerHTML = "~~~~~";
+    noteScreenElem.style.transitionTimingFunction = "linear";
+    noteScreenElem.style.transition = "background-color 2s";
+    noteScreenElem.style.backgroundColor = "whitesmoke";
+});
+
 socket.on('tone', (newNote) => {
     note = Tonal.Note.fromMidiSharps(newNote + transpose);
     noteElem.innerHTML = note;
