@@ -1,3 +1,4 @@
+import { time } from 'console';
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
@@ -68,7 +69,7 @@ io.on('connection', (socket) => {
         } else {
             console.log("Penta was already stopped");
         }
-    })
+    });
 
     socket.on('arp', () => {
         console.log("going to arp!");
@@ -79,7 +80,17 @@ io.on('connection', (socket) => {
         testing = !testing;
         interval = testing ? 100 : 5000;
         console.log("testing =", testing);
-    })
+    });
+
+    socket.on('upChance', () => {
+        console.log('upchance')
+        chanceMelody = 0.5;
+    });
+
+    socket.on('countdown', () => {
+        console.log('countdown init');
+        countdown (5);
+    });
 });
 
 function reset() {
@@ -92,7 +103,7 @@ let state = 0;
 let n_playing = 2;
 let mapping = [0, 1, 2, 3, 4];
 
-
+let chanceMelody = 0.2;
 
 function state1() {
     // TODO count down at the end
@@ -102,7 +113,7 @@ function state1() {
     console.log(chords[chordNumber]);
     console.log("upper start");
     const chord = chords[chordNumber];
-    const impro = Math.random > 0.8;
+    const impro =  Math.random() < chanceMelody;
     if (impro) {
         console.log("impro");
     }
@@ -122,24 +133,26 @@ function state1() {
         setTimeout(state2, interval);
     }
     else {
-        setTimeout(state4, interval * 4); //TODO set impro time
+        setTimeout(state4, 20_000); //TODO set impro time
     }
 }
 
 function state2() {
     console.log("chord start");
-    const pulse = 3 + Math.random() * 3;
+    const pulse = 1.8 + Math.random() * 2.5;
+    const timeout = interval * 1.5 + Math.random() * Math.random() * 20000;
     for (let i = n_playing; i < 5; i++) {
         const note = chords[chordNumber].chord[i - n_playing];
         const player = players[mapping[i]];
         if (player) {
             console.log("emitting", note);
-            player.emit("chord", Note.midi(note), pulse);
+            player.emit("chord", Note.midi(note), pulse, timeout);
         } else {
             console.log("WARN player offline: ", mapping[i] + 1);
         }
     }
-    setTimeout(state4, interval * 2);
+    console.log("chord duration:", timeout);
+    setTimeout(state4, timeout);
 }
 
 function state4() {
@@ -148,9 +161,25 @@ function state4() {
     chordNumber %= 5;
 
     if (arp) {
-        setTimeout(arpF, interval, 0); //TODO maybe different time here
+        setTimeout(endSolo, 5);
+        setTimeout(arpF, 10, 0);
     } else {
         setTimeout(state1, interval * 2);
+    }
+}
+
+function endSolo() {
+    const chord = chords[chordNumber]
+    const upperVar = randomInt(chord.upper.length);
+    for (let i = 0; i < n_playing; i++) {
+        const note1 = chord.upper[upperVar][1];
+        const note2 = chord.upper[upperVar][0];
+        if (players[3]) {
+            players[3].emit("melody", Note.midi(note1));
+        }
+        if (players[4]) {
+            players[4].emit("melody", Note.midi(note2));
+        }
     }
 }
 
@@ -158,7 +187,7 @@ function state4() {
 const sequence = [0, 1, 3, 2, 4]
 function arpF(i) {
     if (i > 4) {
-        countdown (5);
+        return;
     } else {
         console.log("starting arp player", sequence[i] + 1);
         condSendArp(players[sequence[i]]);
@@ -196,10 +225,6 @@ function printOnline() {
 
 function randomInt(n) {
     return Math.floor(Math.random() * n);
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 server.listen(80, () => console.log('Server running on http://localhost'));

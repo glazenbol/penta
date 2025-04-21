@@ -82,13 +82,13 @@ socket.on('tone', (newNote) => {
 });
 
 
-socket.on('chord', (newNote, frequency) => {
+socket.on('chord', (newNote, frequency, timeout) => {
     note = Tonal.Note.fromMidiSharps(newNote + transpose);
     noteElem.innerHTML = note;
     // start swell
     noteScreenElem.style.animation = "none";
     void noteScreenElem.offsetWidth;
-    noteScreenElem.style.animation = "swell 10s";
+    noteScreenElem.style.animation = "swell " + timeout / 1000 + "s";
     //start blinker
     noteElem.style.animation = "none";
     playStyleElem.style.animation = "none";
