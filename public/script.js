@@ -4,6 +4,7 @@
 const playerSelectorElem = document.getElementById("player-selector");
 const noteScreenElem = document.getElementById("note-screen");
 const noteElem = document.getElementById("note");
+const playStyleElem = document.getElementById("play-style")
 const playerNumberElem = document.getElementById("player-number");
 
 const debug = true;
@@ -27,17 +28,15 @@ const selectPlayer = function(n) {
     noteScreenElem.style.display = "flex";
 }
 
-// Listen for updates from other clients
-socket.on('scoreUpdate', (data) => {
-    notes.push(data); // Add received note
+socket.on('note', (newNote, playStyle) => {
+    note = Tonal.Note.fromMidiSharps(newNote + transpose);
+    noteElem.innerHTML = note;
+    playStyleElem.innerHTML = playStyle;
 });
 
-socket.on('note', (data) => {
-    console.log(data);
-    console.log(Tonal.Note.fromMidiSharps(data));
-    note = Tonal.Note.fromMidiSharps(data + transpose);
-    noteElem.innerHTML = note
-});
+socket.on('mute', () => {
+    
+})
 
 
 let player = -1;

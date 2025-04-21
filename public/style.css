@@ -32,9 +32,9 @@ html, body {
 }
 
 #play-style {
-    font-size: 30vw;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20vw;
     text-align: center;
-    margin: 0px;
 }
 
 #player-number {
