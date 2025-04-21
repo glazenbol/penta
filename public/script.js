@@ -7,36 +7,72 @@ const noteElem = document.getElementById("note");
 const playStyleElem = document.getElementById("play-style")
 const playerNumberElem = document.getElementById("player-number");
 
-const debug = true;
+const debug = false;
 
 // Connect to the server
 let socket = io();
 
 let transpose = 0;
+let started = false;
 button = [];
-const selectPlayer = function(n) {
-    console.log(typeof(n))
+
+function selectPlayer(n) {
     socket.emit('playerSelect', n);
     if (n == 4 || n == 5) {
         transpose = 2;
     }
 
     playerSelectorElem.style.display = "none";
-    if (debug) {
-        playerNumberElem.innerHTML = "p: " + n + "<br>t:+" + transpose;
+    playerNumberElem.innerHTML = "p: " + n + "<br>t:+" + transpose;
+    playerNumberElem.style.color = "whitesmoke";
+    if (!debug) {
+        playerNumberElem.style.opacity = "0%";
     }
+    // show the elem
     noteScreenElem.style.display = "flex";
+    // start showing the info bar on touch
+    document.addEventListener("click", () => {
+        playerNumberElem.style.animation = "none";
+        void playerNumberElem.offsetWidth;
+        playerNumberElem.style.animation = "debug-info 4s";
+    });
 }
 
-socket.on('note', (newNote, playStyle) => {
+socket.on('tone', (newNote) => {
     note = Tonal.Note.fromMidiSharps(newNote + transpose);
     noteElem.innerHTML = note;
-    playStyleElem.innerHTML = playStyle;
+    playStyleElem.innerHTML = "-----";
+    noteScreenElem.style.transitionTimingFunction = "linear";
+    noteScreenElem.style.transition = "background-color 1s";
+    noteScreenElem.style.backgroundColor = "whitesmoke";
+});
+
+
+socket.on('chord', (newNote, frequency) => {
+    note = Tonal.Note.fromMidiSharps(newNote + transpose);
+    noteElem.innerHTML = note;
+    // start swell
+    noteScreenElem.style.animation = "none";
+    void noteScreenElem.offsetWidth;
+    noteScreenElem.style.animation = "swell 10s";
+    //start blinker
+    noteElem.style.animation = "none";
+    playStyleElem.style.animation = "none";
+    void noteElem.offsetWidth;
+    void playStyleElem.offsetWidth;
+    const blinkDuration = 1.0 / frequency;
+    noteElem.style.animation = "blinker " + blinkDuration + "s infinite";
+    playStyleElem.style.animation = "blinker " + blinkDuration + "s infinite";
+
+    playStyleElem.innerHTML = "|||||";
 });
 
 socket.on('mute', () => {
-    
-})
-
+    noteElem.style.animation = "none";
+    playStyleElem.style.animation = "none";
+    noteScreenElem.style.backgroundColor = "black";
+    noteElem.style.color = "black";
+    playStyleElem.style.color = "black";
+});
 
 let player = -1;

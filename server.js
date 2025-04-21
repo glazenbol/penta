@@ -3,8 +3,8 @@ import http from 'http';
 import  { Server } from 'socket.io';
 import { Note } from "tonal";
 
-const testing = false;
-const interval = testing ? 100 : 5000;
+let testing = false;
+let interval = testing ? 100 : 5000;
 
 const app = express();
 const server = http.createServer(app);
@@ -57,6 +57,7 @@ io.on('connection', (socket) => {
         }
     });
     socket.on('stop', () => {
+        reset();
         if (intervalID) {
             clearInterval(intervalID);
             intervalID = 0;
@@ -69,7 +70,18 @@ io.on('connection', (socket) => {
     socket.on('arp', () => {
         console.log("going to arp!");
     });
+
+    socket.on('testing', () => {
+        testing = !testing;
+        interval = testing ? 100 : 5000;
+        console.log("testing =", testing);
+    })
 });
+
+function reset() {
+    state = 0;
+    chordNumber = 0;
+}
 
 let state = 0;
 let n_playing = 2;
@@ -79,7 +91,7 @@ function changeState() {
     switch (state) {
         case 0:
             shuffle(mapping);
-            console.log("next chord:", chordNumber)
+            console.log("next chord:", chordNumber + 1)
             console.log (chords[chordNumber]);
             io.emit("mute");
             break;
@@ -88,7 +100,12 @@ function changeState() {
             for (let i = 0; i < n_playing; i ++) {
                 let note = chords[chordNumber].upper[0][i];
                 const player = players[mapping[i]];
-                sendNote(note, "-----", player, mapping[i]);
+                if (player) {
+                    console.log("emitting",note);
+                    player.emit("tone", Note.midi(note));
+                } else {
+                    console.log("WARN player offline: ", mapping[i] + 1);
+                }
             }
             break;
         case 2:
@@ -96,7 +113,12 @@ function changeState() {
             for (let i = n_playing; i < 5; i ++) {
                 let note = chords[chordNumber].chord[i - n_playing];
                 const player = players[mapping[i]];
-                sendNote(note, "|||||", player, mapping[i]);
+                if (player) {
+                    console.log("emitting",note);
+                    player.emit("chord", Note.midi(note), 3 + Math.random() * 3);
+                } else {
+                    console.log("WARN player offline: ", mapping[i] + 1);
+                }
             }
             break;
         case 3:
@@ -113,14 +135,6 @@ function changeState() {
     state %= 5;
 }
 
-function sendNote(note, playStyle, player, i) {
-    if (player) {
-        console.log("emitting",note);
-        player.emit("note", Note.midi(note), playStyle);
-    } else {
-        console.warn("WARN player offline: ", i + 1);
-    }
-}
 // shuffles the array passed in, doesn't duplicate anything so beware!
 function shuffle(shuffled) {
     for (let i = shuffled.length - 1; i > 0; i--) {

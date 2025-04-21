@@ -10,12 +10,14 @@
     <!-- <link rel="stylesheet" href="style.css"> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
-    <script src="control.js" defer></script>
+    <script defer>socket = io()</script>
 </head>
-<body>
-    <button onclick="start()">start</button>
-    <button onclick="stop()">stop</button>
+<body style="background-color: black;">
+    <button onclick="socket.emit('start')">start</button>
+    <button onclick="socket.emit('stop')">stop</button>
     <br><br>
-    <button onclick="arp()">arp</button>
+    <button onclick="socket.emit('arp')">arp</button>
+    <br><br><br>
+    <button onclick="socket.emit('testing')">testing</button>
 </body>
 </html>

@@ -6,6 +6,7 @@ html, body {
 }
 
 #player-selector {
+    background-color: black;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -17,9 +18,52 @@ html, body {
     font-size: 7vh;
     padding: 1vh;
     margin: 0;
+    color: whitesmoke;
+    background-color: black;
+    border-radius: 5px;
+    border-color: rgb(47, 128, 228);
+    border-style: solid;
 }
 
+@keyframes debug-info {
+    0% {
+        opacity: 100%;
+    }
+    75% {
+        opacity: 100%;
+        animation-timing-function: ease-out;
+    }
+}
+
+@keyframes blinker {
+    50% { 
+        color: whitesmoke;
+        animation-timing-function: step-start;
+    }
+}
+
+@keyframes swell {
+    0%{
+        background-color: black;
+        animation-timing-function: ease-in;
+    }
+    50% {
+        background-color: whitesmoke;
+        animation-timing-function: ease-in-out;
+    }
+    100% {
+        background-color: black;
+        animation-timing-function: ease-in;
+    }
+}
+
+
+
+
 #note-screen {
+    /* transition: background-color 5s;
+    transition-timing-function: ease-in; */
+    background-color: black;
     flex-direction: column;
     justify-content: center;
     height: 100%;
@@ -29,20 +73,27 @@ html, body {
     font-size: 40vw;
     text-align: center;
     margin: 0px;
+    color: whitesmoke;
 }
 
 #play-style {
     font-family: 'Courier New', Courier, monospace;
     font-size: 20vw;
     text-align: center;
+    color: whitesmoke;
+
+    transition: color 0.3s;
+    transition-timing-function: linear;
 }
 
 #player-number {
     font-family:'Courier New', Courier, monospace;
-    font-size: 1em;
+    font-size: 0.8em;
     position: absolute;
     right: 20px;
     top: 15px;
-    color: rgb(184, 183, 183);
+    color: black;
+    transition: color 0.3s;
+    transition-timing-function: linear;
     margin: 0;
 }
