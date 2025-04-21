@@ -128,12 +128,13 @@ function state1() {
 
 function state2() {
     console.log("chord start");
+    const pulse = 3 + Math.random() * 3;
     for (let i = n_playing; i < 5; i++) {
         const note = chords[chordNumber].chord[i - n_playing];
         const player = players[mapping[i]];
         if (player) {
             console.log("emitting", note);
-            player.emit("chord", Note.midi(note), 3 + Math.random() * 3);
+            player.emit("chord", Note.midi(note), pulse);
         } else {
             console.log("WARN player offline: ", mapping[i] + 1);
         }
