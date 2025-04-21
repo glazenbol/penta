@@ -97,8 +97,11 @@ function changeState() {
             break;
         case 1:
             console.log("upper start");
+            const chord = chords[chordNumber];
+            const upperVar = randomInt(chord.upper.length);
             for (let i = 0; i < n_playing; i ++) {
-                let note = chords[chordNumber].upper[0][i];
+                console.log (upperVar);
+                const note = chord.upper[upperVar][i];
                 const player = players[mapping[i]];
                 if (player) {
                     console.log("emitting",note);
@@ -111,7 +114,7 @@ function changeState() {
         case 2:
             console.log("chord start");
             for (let i = n_playing; i < 5; i ++) {
-                let note = chords[chordNumber].chord[i - n_playing];
+                const note = chords[chordNumber].chord[i - n_playing];
                 const player = players[mapping[i]];
                 if (player) {
                     console.log("emitting",note);
@@ -147,6 +150,10 @@ function printOnline() {
     for (let i = 0; i < 5; i ++) {
         console.log("player", i + 1, "is", players[i] ? "\b" : "not", "online");
     }
+}
+
+function randomInt(n) {
+    return Math.floor(Math.random() * n);
 }
 
 server.listen(3000, () => console.log('Server running on http://localhost:3000'));
